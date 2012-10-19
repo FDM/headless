@@ -5,13 +5,13 @@ class Headless
     attr_accessor :pid_file_path, :tmp_file_path, :log_file_path
 
     def initialize(display, dimensions, options = {})
-      CliUtil.ensure_application_exists!('ffmpeg', 'Ffmpeg not found on your system. Install it with sudo apt-get install ffmpeg')
+      CliUtil.ensure_application_exists!('recordmydesktop', 'Record my desktop not found on your system. Install it with sudo apt-get install recordmydesktop')
 
       @display = display
       @dimensions = dimensions
 
-      @pid_file_path = options.fetch(:pid_file_path, "/tmp/.headless_ffmpeg_#{@display}.pid")
-      @tmp_file_path = options.fetch(:tmp_file_path, "/tmp/.headless_ffmpeg_#{@display}.mov")
+      @pid_file_path = options.fetch(:pid_file_path, "/tmp/.headless_recordmydesktop_#{@display}.pid")
+      @tmp_file_path = options.fetch(:tmp_file_path, "/tmp/.headless_recordmydesktop_#{@display}.mov")
       @log_file_path = options.fetch(:log_file_path, "/dev/null")
       @codec = options.fetch(:codec, "qtrle")
       @frame_rate = options.fetch(:frame_rate, 30)
@@ -22,7 +22,7 @@ class Headless
     end
 
     def start_capture
-      CliUtil.fork_process("#{CliUtil.path_to('ffmpeg')} -y -r #{@frame_rate} -g 600 -s #{@dimensions} -f x11grab -i :#{@display} -vcodec #{@codec} #{@tmp_file_path}", @pid_file_path, @log_file_path)
+      CliUtil.fork_process("#{CliUtil.path_to('recordmydesktop')} --on-the-fly-encoding --overwrite --width=#{width} --height=#{height} --display :#{@display}  --workdir=\"#{File.dirname(@tmp_file_path)}\" --output=\"#{File.basename(@tmp_file_path)}\"", @pid_file_path, @log_file_path)
       at_exit do
         exit_status = $!.status if $!.is_a?(SystemExit)
         stop_and_discard
