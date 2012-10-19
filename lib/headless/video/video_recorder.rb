@@ -22,6 +22,7 @@ class Headless
     end
 
     def start_capture
+      width,height=@dimensions.split(/x/i)
       CliUtil.fork_process("#{CliUtil.path_to('recordmydesktop')} --on-the-fly-encoding --overwrite --width=#{width} --height=#{height} --display :#{@display}  --workdir=\"#{File.dirname(@tmp_file_path)}\" --output=\"#{File.basename(@tmp_file_path)}\"", @pid_file_path, @log_file_path)
       at_exit do
         exit_status = $!.status if $!.is_a?(SystemExit)
